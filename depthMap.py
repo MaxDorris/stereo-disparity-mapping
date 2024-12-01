@@ -24,7 +24,7 @@ class DepthMap:
     def computeDepthMapBM(self):
         nDispFactor = 16 # adjustable
         stereo = cv. StereoBM.create(numDisparities=16*nDispFactor,
-                                     blockSize=21)
+                                    blockSize=21)
         disparity = stereo.compute(self.imgLeft, self.imgRight)
         plt.imshow(disparity,'gray')
         plt.show()
@@ -33,6 +33,28 @@ class DepthMap:
         window_size = 7
         min_disp = 16
         nDispFactor = 14 # adjustable (14 is good)
+        num_disp = 16 * nDispFactor - min_disp
+
+        stereo = cv.StereoSGBM_create(minDisparity=min_disp,
+                                    numDisparities=num_disp,
+                                    blockSize=window_size,
+                                    P1=8*3*window_size**2,
+                                    P2=32*3*window_size**2,
+                                    disp12MaxDiff=1,
+                                    uniquenessRatio=15,
+                                    speckleWindowsseize=0,
+                                    speckleRange=2,
+                                    preFilterCap=63,
+                                    mode=cv.STEREO_SGBM_MODE_SGBM_3WAY)
+
+        # compute disparity map
+        disparity = stereo.compute(self.imgLeft, self.imgRight).astype(np.float32) / 16.0
+
+        # display disparity map
+        plt.imshow(disparity, 'gray')
+        plt.colorbar()
+        plt.show()
+
 
 def demoViewPics():
     # initializes an object of class "DepthMap", passing in the extra arg of showImages=True so that the images are plotted after being loaded in after initialization
@@ -47,6 +69,6 @@ def demoStereoSGBM():
     dp.computeDepthMapSGBM()
 
 if __name__ == '__main__':
-    # demoViewPics()
+    demoViewPics()
     demoStereoBM()
-    # demoStereoSGBM()
+    demoStereoSGBM()
