@@ -7,4 +7,3 @@
 IMPORTANT LINKS:
 
 Stereo DepthMap Image Archive -> https://3dstereophoto.blogspot.com/2015/03/3d-photos-motorcycle.html
-
