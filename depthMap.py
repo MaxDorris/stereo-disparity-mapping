@@ -2,32 +2,36 @@ import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
 import os
+import sys
 
 class DepthMap:
-    def __init__(self,showImages):
+    def __init__(self,showImages, imgSet):
 
         # Load images
         root = os.getcwd()
-        imgLeftPath = os.path.join(root, 'demoImages//sticks//im0.png')
-        imgRightPath = os.path.join(root, 'demoImages//sticks//im1.png')
+        imgLeftPath = os.path.join(root, f'demoImages//{imgSet}//im0.png')
+        imgRightPath = os.path.join(root, f'demoImages//{imgSet}//im1.png')
         self.imgLeft = cv.imread(imgLeftPath,cv.IMREAD_GRAYSCALE)
         self.imgRight = cv.imread(imgRightPath,cv.IMREAD_GRAYSCALE)
 
         if showImages: # plot the images next to eachother
-            plt.figure()
-            plt.subplot(121)
+            plt.figure(1)
+            plt.subplot(221)
             plt.imshow(self.imgLeft)
-            plt.subplot(122)
+            plt.subplot(222)
             plt.imshow(self.imgRight)
-            plt.show()
+            # plt.show()
 
     def computeDepthMapBM(self):
         nDispFactor = 16 # adjustable
         stereo = cv. StereoBM.create(numDisparities=16*nDispFactor,
                                     blockSize=21)
         disparity = stereo.compute(self.imgLeft, self.imgRight)
+
+        plt.figure(1)
+        plt.subplot(223)
         plt.imshow(disparity,'gray')
-        plt.show()
+        # plt.show()
     
     def computeDepthMapSGBM(self):
         window_size = 7
@@ -42,7 +46,7 @@ class DepthMap:
                                     P2=32*3*window_size**2,
                                     disp12MaxDiff=1,
                                     uniquenessRatio=15,
-                                    speckleWindowsseize=0,
+                                    speckleWindowSize=0,
                                     speckleRange=2,
                                     preFilterCap=63,
                                     mode=cv.STEREO_SGBM_MODE_SGBM_3WAY)
@@ -51,14 +55,16 @@ class DepthMap:
         disparity = stereo.compute(self.imgLeft, self.imgRight).astype(np.float32) / 16.0
 
         # display disparity map
+        plt.figure(1)
+        plt.subplot(224)
         plt.imshow(disparity, 'gray')
         plt.colorbar()
         plt.show()
 
 
-def demoViewPics():
+def demoViewPics(imgSet):
     # initializes an object of class "DepthMap", passing in the extra arg of showImages=True so that the images are plotted after being loaded in after initialization
-    dp = DepthMap(showImages=True)
+    dp = DepthMap(showImages=True, imgSet=imgSet)
 
 def demoStereoBM():
     dp = DepthMap(showImages=False)
@@ -69,6 +75,14 @@ def demoStereoSGBM():
     dp.computeDepthMapSGBM()
 
 if __name__ == '__main__':
-    demoViewPics()
+
+    # Access arguments directly
+    args = sys.argv[1:]  # Skip the script name (sys.argv[0])
+    imgSet = args[0]
+    print(imgSet)
+
+    # run functions
+
+    demoViewPics(imgSet)
     demoStereoBM()
     demoStereoSGBM()
