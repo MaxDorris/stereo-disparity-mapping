@@ -5,7 +5,17 @@ import os
 import sys
 
 class DepthMap:
-    def __init__(self,showImages, imgSet):
+    def __init__(self,showImages):
+
+        # configure which image set to use
+        args = sys.argv[1:]
+
+        try:
+            imgSet = args[0]
+
+        except IndexError:
+            print("USAGE: depthMap.py 'imageSet'")
+            sys.exit(1)
 
         # Load images
         root = os.getcwd()
@@ -62,9 +72,9 @@ class DepthMap:
         plt.show()
 
 
-def demoViewPics(imgSet):
+def demoViewPics():
     # initializes an object of class "DepthMap", passing in the extra arg of showImages=True so that the images are plotted after being loaded in after initialization
-    dp = DepthMap(showImages=True, imgSet=imgSet)
+    dp = DepthMap(showImages=True)
 
 def demoStereoBM():
     dp = DepthMap(showImages=False)
@@ -76,13 +86,7 @@ def demoStereoSGBM():
 
 if __name__ == '__main__':
 
-    # Access arguments directly
-    args = sys.argv[1:]  # Skip the script name (sys.argv[0])
-    imgSet = args[0]
-    print(imgSet)
-
     # run functions
-
-    demoViewPics(imgSet)
+    demoViewPics()
     demoStereoBM()
     demoStereoSGBM()
