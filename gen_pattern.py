@@ -1,42 +1,28 @@
-#!/usr/bin/env python
+import matplotlib.pyplot as plt
+import numpy as np
 
-import argparse
-from reportlab.graphics import shapes
-from reportlab.graphics.shapes import Drawing, Rect, Circle
-from reportlab.lib.pagesizes import A4
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPDF, renderPM
+# Parameters for the checkerboard
+rows = 6  # Number of rows (6 squares)
+cols = 9  # Number of columns (9 squares)
+square_size = 25  # Size of each square in mm
 
-class PatternMaker:
-    def __init__(self, cols, rows, square_size, page_width, page_height, output):
-        self.cols = cols
-        self.rows = rows
-        self.square_size = square_size
-        self.page_width = page_width
-        self.page_height = page_height
-        self.output = output
+# Convert square size to inches (1 inch = 25.4 mm)
+square_size_inch = square_size / 25.4
 
-    def make_checkerboard_pattern(self):
-        """Generate a checkerboard pattern."""
-        drawing = Drawing(self.page_width, self.page_height)
-        x_offset = (self.page_width - (self.cols * self.square_size)) / 2
-        y_offset = (self.page_height - (self.rows * self.square_size)) / 2
+# Create the checkerboard pattern
+checkerboard = np.zeros((rows, cols))
+for i in range(rows):
+    for j in range(cols):
+        if (i + j) % 2 == 0:
+            checkerboard[i, j] = 1
 
-        for row in range(self.rows):
-            for col in range(self.cols):
-                # Alternate black and white squares
-                if (row + col) % 2 == 0:
-                    x = x_offset + col * self.square_size
-                    y = y_offset + row * self.square_size
-                    rect = Rect(x, y, self.square_size, self.square_size, fillColor="black")
-                    drawing.add(rect)
+# Plot the checkerboard
+fig, ax = plt.subplots(figsize=(cols * square_size_inch, rows * square_size_inch))
+ax.imshow(checkerboard, cmap='gray', interpolation='nearest')
+ax.axis('off')
 
-        return drawing
+# Save the checkerboard as a PDF for printing
+plt.savefig("checkerboard_9x6_25mm.pdf", bbox_inches='tight', pad_inches=0)
+plt.close()
 
-    def save_as_svg(self, drawing):
-        """Save the generated pattern as an SVG file."""
-        from svglib.svglib import svg2rlg  # Import svglib's svg2rlg function
-        from reportlab.graphics import renderPDF
-
-        # Save as SVG using ReportLab's render capabilities
-        renderPDF.drawToFile(drawing)
+print("Checkerboard saved as 'checkerboard_9x6_25mm.pdf'")
